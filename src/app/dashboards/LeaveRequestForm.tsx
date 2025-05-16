@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { LeaveType } from './EmployeeDashboard';
 
+interface LeaveRequestFormData {
+  leave_type_id: string;
+  reason: string;
+  startDate: string;
+  endDate: string;
+}
+
 interface LeaveRequestFormProps {
   leaveTypes: LeaveType[];
-  onSubmit: (data: any) => void;
+  onSubmit: (data: LeaveRequestFormData) => void;
 }
 
 const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({ leaveTypes, onSubmit }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LeaveRequestFormData>({
     leave_type_id: '',
     reason: '',
     startDate: '',
@@ -20,7 +27,7 @@ const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({ leaveTypes, onSubmi
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(formData);
   };

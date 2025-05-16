@@ -139,7 +139,7 @@ const EmployeeDashboard = () => {
       {error && <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>}
       {loading && <p className="text-gray-500 dark:text-gray-400 mb-4">Loading...</p>}
 
-      <LeaveRequestForm leaveTypes={leaveTypes} onSubmit={handleLeaveRequestSubmit} />
+      <LeaveRequestForm leaveTypes={leaveTypes} onSubmit={()=>handleLeaveRequestSubmit} />
 
       <div className="flex flex-wrap gap-4 mt-6">
         <button
