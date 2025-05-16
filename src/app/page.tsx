@@ -6,7 +6,7 @@ interface EmployeeFormProps {
   onSubmit: (data: EmployeeFormData) => void;
 }
 
-export interface EmployeeFormData {
+ interface EmployeeFormData {
   name: string;
   email: string;
   password: string;
