@@ -2,9 +2,7 @@
 import { useState } from 'react';
 // import UserForm from './components/AdminForm';
 import LoginForm from './components/LoginForm';
-interface EmployeeFormProps {
-  onSubmit: (data: EmployeeFormData) => void;
-}
+
 
  interface EmployeeFormData {
   name: string;
@@ -16,7 +14,7 @@ interface EmployeeFormProps {
   directorId?: string;
 }
 
-const EmployeeForm: React.FC<EmployeeFormProps> = ({ onSubmit }) => {
+const EmployeeForm= () => {
   const [formData, setFormData] = useState<EmployeeFormData>({
     name: '',
     email: '',
