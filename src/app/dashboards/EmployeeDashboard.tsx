@@ -5,7 +5,13 @@ import LeaveRequestForm from './LeaveRequestForm';
 export interface LeaveType {
   id: string;
   leave_type: string;
+}export interface LeaveRequestFormValues {
+  leaveTypeId: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
 }
+
 
 interface LeaveRequest {
   endDate: string | number | Date;
@@ -41,7 +47,7 @@ const EmployeeDashboard = () => {
       setLoading(true);
       try {
         const res = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveTypes');
-        const data = await res.json();
+        const data: LeaveType[] = await res.json();
         setLeaveTypes(data);
         setError(null);
       } catch (err) {
@@ -55,7 +61,7 @@ const EmployeeDashboard = () => {
     fetchLeaveTypes();
   }, []);
 
-  const handleLeaveRequestSubmit = async (formData: any) => {
+  const handleLeaveRequestSubmit = async (formData: LeaveRequestFormValues) => {
     try {
       const response = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveRequest', {
         method: 'POST',
@@ -91,7 +97,7 @@ const EmployeeDashboard = () => {
         throw new Error('Failed to fetch leave requests');
       }
 
-      const data = await response.json();
+      const data: LeaveRequest[] = await response.json();
       setLeaveRequests(data);
       setError(null);
     } catch (error) {
@@ -114,7 +120,7 @@ const EmployeeDashboard = () => {
         throw new Error('Failed to fetch leave balances');
       }
 
-      const data = await response.json();
+      const data: LeaveBalance[] = await response.json();
       setLeaveDetails(data);
       setError(null);
     } catch (error) {

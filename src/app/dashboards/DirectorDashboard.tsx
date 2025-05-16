@@ -2,15 +2,16 @@
 
 import { useState } from 'react';
 
+type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
+
 type LeaveRequest = {
-  HR_approval: string;
   id: string;
   startDate: string;
   endDate: string;
   status: string;
-  manager_approval: 'Pending' | 'Approved' | 'Rejected';
-  hr_approval: 'Pending' | 'Approved' | 'Rejected';
-  director_approval: 'Pending' | 'Approved' | 'Rejected';
+  manager_approval: ApprovalStatus;
+  HR_approval: ApprovalStatus;
+  director_approval: ApprovalStatus;
   employee: {
     fullname: string;
   };
@@ -33,14 +34,17 @@ const DirectorDashboard = () => {
 
       if (!response.ok) throw new Error('Failed to fetch leave requests');
 
-      const data = await response.json();
+      const data: LeaveRequest[] = await response.json();
       setLeaveRequests(data);
-      console.log(data)
-
       setShowTable(true);
-    } catch (err: any) {
-      console.error('Fetch error:', err);
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Fetch error:', err.message);
+        setError(err.message);
+      } else {
+        console.error('Unknown error:', err);
+        setError('An unknown error occurred.');
+      }
     } finally {
       setLoading(false);
     }
@@ -56,22 +60,14 @@ const DirectorDashboard = () => {
           approved: decision === 'Approved',
         }),
       });
-      
+
       if (!response.ok) throw new Error('Failed to update leave request');
-      
       await fetchLeaveRequests(); // Refresh list
     } catch (err) {
       console.error('Approval error:', err);
       alert('❌ Failed to update leave request');
     }
   };
-  {leaveRequests.map((request) => (
-
-  
-  console.log(  request.director_approval === 'Pending' && request.HR_approval === 'Approved')
-  ))}
-
-
 
   return (
     <div className="p-6 max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-md shadow transition-colors">
@@ -117,9 +113,7 @@ const DirectorDashboard = () => {
                   <td className="px-4 py-2 border">{request.HR_approval}</td>
                   <td className="px-4 py-2 border">{request.director_approval}</td>
                   <td className="px-4 py-2 border space-x-2">
-                    {
-                    
-                    request.director_approval === 'Pending' && request.HR_approval === 'Approved' ? (
+                    {request.director_approval === 'Pending' && request.HR_approval === 'Approved' ? (
                       <>
                         <button
                           onClick={() => handleDirectorApproval(request.id, 'Approved')}
