@@ -62,8 +62,8 @@ const LoginForm: React.FC = () => {
       }
 
       const { token } = data;
-      const userRole = token.role;
-
+      const userRole = data.role;
+console.log(data)
       // Save role in cookie
       Cookies.set("role", userRole, { expires: 1 }); // expires in 1 day
 
