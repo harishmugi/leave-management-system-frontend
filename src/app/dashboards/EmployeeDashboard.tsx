@@ -5,13 +5,14 @@ import LeaveRequestForm from './LeaveRequestForm';
 export interface LeaveType {
   id: string;
   leave_type: string;
-}export interface LeaveRequestFormValues {
-  leaveTypeId: string;
+}
+
+export interface LeaveRequestFormValues {
+  leave_type_id: string;
   startDate: string;
   endDate: string;
   reason: string;
 }
-
 
 interface LeaveRequest {
   endDate: string | number | Date;
@@ -41,6 +42,7 @@ const EmployeeDashboard = () => {
   const [viewMode, setViewMode] = useState<'requests' | 'details' | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
   useEffect(() => {
     const fetchLeaveTypes = async () => {
@@ -63,6 +65,8 @@ const EmployeeDashboard = () => {
 
   const handleLeaveRequestSubmit = async (formData: LeaveRequestFormValues) => {
     try {
+      setFormKey(prev => prev + 1); // 🔁 Reset form
+
       const response = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveRequest', {
         method: 'POST',
         credentials: 'include',
@@ -71,12 +75,10 @@ const EmployeeDashboard = () => {
       });
 
       if (response.ok) {
-        alert('Leave request submitted!');
-        fetchLeaveRequests();
-        setViewMode('requests');
+        await fetchLeaveRequests();   // Refresh requests
+        setViewMode('requests');      // Show request table
         setError(null);
       } else {
-        alert('Submission failed.');
         setError('Failed to submit leave request.');
       }
     } catch (err) {
@@ -111,6 +113,7 @@ const EmployeeDashboard = () => {
   const fetchLeaveDetails = async () => {
     setLoading(true);
     try {
+      console.log('fetching')
       const response = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveBalance', {
         method: 'GET',
         credentials: 'include',
@@ -119,8 +122,9 @@ const EmployeeDashboard = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch leave balances');
       }
-
-      const data: LeaveBalance[] = await response.json();
+      console.log('res', response)
+      const data = await response.json();
+      console.log('data', data)
       setLeaveDetails(data);
       setError(null);
     } catch (error) {
@@ -139,7 +143,11 @@ const EmployeeDashboard = () => {
       {error && <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>}
       {loading && <p className="text-gray-500 dark:text-gray-400 mb-4">Loading...</p>}
 
-      <LeaveRequestForm leaveTypes={leaveTypes} onSubmit={()=>handleLeaveRequestSubmit} />
+      <LeaveRequestForm
+        leaveTypes={leaveTypes}
+        onSubmit={handleLeaveRequestSubmit}
+        formKey={formKey}
+      />
 
       <div className="flex flex-wrap gap-4 mt-6">
         <button

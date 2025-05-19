@@ -1,9 +1,9 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 type LeaveRequest = {
-  reason: ReactNode;
+  reason: string;
   id: string;
   startDate: string;
   endDate: string;
@@ -46,11 +46,12 @@ const ManagerDashboard = () => {
     try {
       const response = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/leaveRequest/${id}`, {
         method: "PATCH",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: "Manager",
+          id: "Manager", // or 'id: "Manager"' if that's what your backend expects
           approved: decision === "Approved",
         }),
       });
@@ -69,7 +70,7 @@ const ManagerDashboard = () => {
   }, []);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto text-gray-900 dark:bg-gray-900	 dark:text-gray-100">
+    <div className="p-6 max-w-6xl mx-auto text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       <h1 className="text-2xl font-bold mb-2">Welcome, Manager</h1>
       <p className="mb-4">Click below to view employee leave requests for approval.</p>
 

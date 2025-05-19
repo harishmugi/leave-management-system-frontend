@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import { LeaveType } from './EmployeeDashboard';
 
 interface LeaveRequestFormData {
@@ -11,15 +12,26 @@ interface LeaveRequestFormData {
 interface LeaveRequestFormProps {
   leaveTypes: LeaveType[];
   onSubmit: (data: LeaveRequestFormData) => void;
+  formKey: number; // used to reset form
 }
 
-const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({ leaveTypes, onSubmit }) => {
+const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({ leaveTypes, onSubmit, formKey }) => {
   const [formData, setFormData] = useState<LeaveRequestFormData>({
     leave_type_id: '',
     reason: '',
     startDate: '',
     endDate: ''
   });
+
+  // 🔁 Reset form when formKey changes
+  useEffect(() => {
+    setFormData({
+      leave_type_id: '',
+      reason: '',
+      startDate: '',
+      endDate: ''
+    });
+  }, [formKey]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>

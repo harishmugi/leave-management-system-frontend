@@ -22,7 +22,6 @@ const LoginForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<string | null>(null);
 
-  // Check for role in cookie on mount
   useEffect(() => {
     const storedRole = Cookies.get("role");
     if (storedRole) {
@@ -39,10 +38,11 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    console.log("Form submitted:", formData);
 
     try {
       const response = await fetch(
-        "https://leave-management-system-backend-g9ke.onrender.com/login",
+        "https://leave-management-system-backend-g9ke.onrender.com/login", // Replace with your actual backend URL
         {
           method: "POST",
           headers: {
@@ -54,20 +54,21 @@ const LoginForm: React.FC = () => {
       );
 
       const data = await response.json();
+      console.log("Login response:", data);
 
       if (!response.ok) {
         setError(data?.error || "Login failed");
-        setLoading(false);
         return;
       }
 
-      const { token } = data;
-      const userRole = data.role;
-console.log(data)
-      // Save role in cookie
-      Cookies.set("role", userRole, { expires: 1 }); // expires in 1 day
+      const { token, role: userRole } = data;
 
-      // Set state to show dashboard
+      if (!userRole) {
+        setError("Invalid response: role not found");
+        return;
+      }
+
+      Cookies.set("role", userRole, { expires: 1 });
       setRole(userRole);
     } catch (err) {
       console.error("Login error:", err);
@@ -105,12 +106,20 @@ console.log(data)
           onSubmit={handleSubmit}
           className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow space-y-4"
         >
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Login</h2>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+            Login
+          </h2>
 
-          {error && <p className="text-red-600 dark:text-red-400">{error}</p>}
+          {error && (
+            <p className="text-red-600 dark:text-red-400 font-semibold">
+              {error}
+            </p>
+          )}
 
           <div>
-            <label className="block text-gray-700 dark:text-gray-200">Email</label>
+            <label className="block text-gray-700 dark:text-gray-200">
+              Email
+            </label>
             <input
               name="email"
               type="email"
@@ -122,7 +131,9 @@ console.log(data)
           </div>
 
           <div>
-            <label className="block text-gray-700 dark:text-gray-200">Password</label>
+            <label className="block text-gray-700 dark:text-gray-200">
+              Password
+            </label>
             <input
               name="password"
               type="password"
