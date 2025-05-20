@@ -27,7 +27,7 @@ const DirectorDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/leaveRequests`, {
+      const response = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/leaveRequests/approver`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -58,7 +58,7 @@ const DirectorDashboard = () => {
         body: JSON.stringify({
           id: 'Director',
           approved: decision === 'Approved',
-        }),
+        }),credentials:'include'
       });
 
       if (!response.ok) throw new Error('Failed to update leave request');

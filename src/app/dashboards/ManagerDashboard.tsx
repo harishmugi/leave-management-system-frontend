@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import EmployeeDashboard from "./EmployeeDashboard";
 
 type LeaveRequest = {
   reason: string;
@@ -8,6 +9,7 @@ type LeaveRequest = {
   startDate: string;
   endDate: string;
   status: string;
+  leaveType:{leave_type:string};
   manager_approval: string;
   employee: {
     fullname: string;
@@ -33,6 +35,7 @@ const ManagerDashboard = () => {
 
       const data = await response.json();
       setLeaveRequests(data);
+      console.log(data)
       setShowTable(true);
     } catch (err: any) {
       console.error("Fetch error:", err);
@@ -74,6 +77,7 @@ const ManagerDashboard = () => {
       <h1 className="text-2xl font-bold mb-2">Welcome, Manager</h1>
       <p className="mb-4">Click below to view employee leave requests for approval.</p>
 
+<EmployeeDashboard/>
       <button
         onClick={fetchLeaveRequests}
         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4"
@@ -91,7 +95,8 @@ const ManagerDashboard = () => {
         <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800">
-              <th className="border px-4 py-2">Employee</th>
+              <th className="border px-4 py-2">Employee</th>              <th className="border px-4 py-2">Leave type </th>
+
               <th className="border px-4 py-2">Reason</th>
               <th className="border px-4 py-2">Start Date</th>
               <th className="border px-4 py-2">End Date</th>
@@ -101,9 +106,10 @@ const ManagerDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {leaveRequests.map((request) => (
+            {leaveRequests.filter(request => request.status === 'Pending').map((request) => (
               <tr key={request.id} className="bg-white dark:bg-gray-900">
                 <td className="border px-4 py-2">{request.employee?.fullname || "Unknown"}</td>
+                <td className="border px-4 py-2">{request.leaveType.leave_type}</td>
                 <td className="border px-4 py-2">{request.reason}</td>
                 <td className="border px-4 py-2">{new Date(request.startDate).toLocaleDateString()}</td>
                 <td className="border px-4 py-2">{new Date(request.endDate).toLocaleDateString()}</td>
