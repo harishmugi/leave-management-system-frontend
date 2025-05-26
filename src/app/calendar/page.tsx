@@ -7,8 +7,10 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { option } from 'framer-motion/client';
 
 const localizer = momentLocalizer(moment);
-
-interface LeaveEvent {
+interface Role{
+    role: string;
+}
+interface LeaveEvent extends Role {
   id: string;
   title: string;
   start: Date;
@@ -16,7 +18,6 @@ interface LeaveEvent {
   leaveType: string;
   employeeName: string;
   color: string;
-  role: string;
 }
 
 const leaveColors: Record<string, string> = {
@@ -27,8 +28,7 @@ const leaveColors: Record<string, string> = {
   'Unpaid Leave': '#10B981',
   'Maternity/Paternity Leave': '#F59E0B'
 };
-
-export default function LeaveCalendar({ role }: { role: 'Manager' | 'HR' | 'Director' }) {
+export default function LeaveCalendar( {role}:Role ) {
   const [events, setEvents] = useState<LeaveEvent[]>([]);
   const [allData, setAllData] = useState<LeaveEvent[]>([]);
   const [search, setSearch] = useState('');
