@@ -1,7 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiBell,
+  FiCheck,
+  FiX,
+  FiCalendar,
+  FiLoader,
+  FiAlertCircle,
+  FiCheckCircle,
+  FiUser
+} from "react-icons/fi";
 import EmployeeDashboard from "./EmployeeDashboard";
+import LeaveCalendar from "../calendar/page";
 
 type LeaveRequest = {
   reason: string;
@@ -9,22 +21,24 @@ type LeaveRequest = {
   startDate: string;
   endDate: string;
   status: string;
-  leaveType:{leave_type:string};
+  leaveType: { leave_type: string };
   manager_approval: string;
   employee: {
     fullname: string;
   };
 };
 
+type ViewMode = "requests" | "employee" | "calendar";
+
 const ManagerDashboard = () => {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showTable, setShowTable] = useState(false);
+  const [notification, setNotification] = useState({ text: "", type: "" });
+  const [currentView, setCurrentView] = useState<ViewMode>("requests");
 
   const fetchLeaveRequests = async () => {
     setLoading(true);
-    setError(null);
+    setNotification({ text: "", type: "" });
     try {
       const response = await fetch("https://leave-management-system-backend-g9ke.onrender.com/leaveRequests/approver", {
         method: "GET",
@@ -35,11 +49,10 @@ const ManagerDashboard = () => {
 
       const data = await response.json();
       setLeaveRequests(data);
-      console.log(data)
-      setShowTable(true);
+      setNotification({ text: "Leave requests loaded successfully", type: "success" });
     } catch (err: any) {
       console.error("Fetch error:", err);
-      setError(err.message || "Something went wrong");
+      setNotification({ text: err.message || "Something went wrong", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -49,12 +62,12 @@ const ManagerDashboard = () => {
     try {
       const response = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/leaveRequest/${id}`, {
         method: "PATCH",
-        credentials: 'include',
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: "Manager", // or 'id: "Manager"' if that's what your backend expects
+          id: "Manager",
           approved: decision === "Approved",
         }),
       });
@@ -62,9 +75,16 @@ const ManagerDashboard = () => {
       if (!response.ok) throw new Error("Failed to update leave request");
 
       await fetchLeaveRequests();
+      setNotification({
+        text: `Leave request ${decision.toLowerCase()} successfully`,
+        type: "success",
+      });
     } catch (err: any) {
       console.error("Approval error:", err);
-      alert("❌ Failed to update leave request.");
+      setNotification({
+        text: "Failed to update leave request",
+        type: "error",
+      });
     }
   };
 
@@ -72,70 +92,232 @@ const ManagerDashboard = () => {
     fetchLeaveRequests();
   }, []);
 
+  useEffect(() => {
+    if (notification.text) {
+      const timer = setTimeout(() => setNotification({ text: "", type: "" }), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
+  const renderCurrentView = () => {
+    switch(currentView) {
+      case "employee":
+        return (
+          <div className="p-6">
+            <EmployeeDashboard />
+          </div>
+        );
+      case "calendar":
+        return (
+          <div className="p-6">
+            <LeaveCalendar role="Manager" />
+          </div>
+        );
+      case "requests":
+      default:
+        return (
+          <div className="p-6">
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <FiLoader className="animate-spin text-4xl text-blue-500" />
+              </div>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center gap-2">
+                  <FiCalendar />
+                  Pending Approval Requests
+                </h2>
+                {leaveRequests.filter(request => request.status === "Pending").length === 0 ? (
+                  <div className="p-8 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    No pending leave requests found.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full bg-white dark:bg-gray-700 rounded-xl overflow-hidden">
+                      <thead className="bg-gray-100 dark:bg-gray-800">
+                        <tr>
+                          {["Employee", "Leave Type", "Reason", "Dates", "Status", "Actions"].map(
+                            (header) => (
+                              <th
+                                key={header}
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                              >
+                                {header}
+                              </th>
+                            )
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                        {leaveRequests
+                          .filter((request) => request.status === "Pending")
+                          .map((request) => (
+                            <tr key={request.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                              <td className="px-6 py-4 text-sm font-medium text-gray-800 dark:text-white">
+                                {request.employee?.fullname || "Unknown"}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
+                                {request.leaveType.leave_type}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300 max-w-xs truncate">
+                                {request.reason}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
+                                {new Date(request.startDate).toLocaleDateString()} -{" "}
+                                {new Date(request.endDate).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4">
+                                <span
+                                  className={`px-2 py-1 text-xs rounded-full ${
+                                    request.status === "Approved"
+                                      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                      : request.status === "Pending"
+                                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                  }`}
+                                >
+                                  {request.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex gap-2">
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleApproval(request.id, "Approved")}
+                                    className={`flex items-center gap-1 px-3 py-1 rounded ${
+                                      request.manager_approval !== "Pending"
+                                        ? "bg-gray-200 dark:bg-gray-600 cursor-not-allowed"
+                                        : "bg-green-600 hover:bg-green-700 text-white"
+                                    }`}
+                                    disabled={request.manager_approval !== "Pending"}
+                                  >
+                                    <FiCheck />
+                                    Approve
+                                  </motion.button>
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleApproval(request.id, "Rejected")}
+                                    className={`flex items-center gap-1 px-3 py-1 rounded ${
+                                      request.manager_approval !== "Pending"
+                                        ? "bg-gray-200 dark:bg-gray-600 cursor-not-allowed"
+                                        : "bg-red-600 hover:bg-red-700 text-white"
+                                    }`}
+                                    disabled={request.manager_approval !== "Pending"}
+                                  >
+                                    <FiX />
+                                    Reject
+                                  </motion.button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="p-6 max-w-6xl mx-auto text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-      <h1 className="text-2xl font-bold mb-2">Welcome, Manager</h1>
-      <p className="mb-4">Click below to view employee leave requests for approval.</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Notification */}
+        <AnimatePresence>
+          {notification.text && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-2 z-50 ${
+                notification.type === "success"
+                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                  : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+              }`}
+            >
+              {notification.type === "success" ? (
+                <FiCheckCircle className="text-xl" />
+              ) : (
+                <FiAlertCircle className="text-xl" />
+              )}
+              <span>{notification.text}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-<EmployeeDashboard/>
-      <button
-        onClick={fetchLeaveRequests}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4"
-      >
-        🔔 View Leave Requests
-      </button>
+        {/* Dashboard Card */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden"
+        >
+          {/* Header */}
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                  <FiUser className="text-blue-500" />
+                  Manager Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
+                  {currentView === "requests" && "Review and approve leave requests"}
+                  {currentView === "employee" && "Employee dashboard"}
+                  {currentView === "calendar" && "Team leave calendar"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentView("requests")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow ${
+                    currentView === "requests" 
+                      ? "bg-blue-600 text-white" 
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+                  }`}
+                >
+                  <FiBell />
+                  Requests
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentView("employee")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow ${
+                    currentView === "employee" 
+                      ? "bg-purple-600 text-white" 
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+                  }`}
+                >
+                  <FiUser />
+                  My leaves
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentView("calendar")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow ${
+                    currentView === "calendar" 
+                      ? "bg-green-600 text-white" 
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white"
+                  }`}
+                >
+                  <FiCalendar />
+                  Calendar
+                </motion.button>
+              </div>
+            </div>
+          </div>
 
-      {loading && <p className="text-gray-600 dark:text-gray-400">Loading leave requests...</p>}
-      {error && <p className="text-red-500">Error: {error}</p>}
-      {!loading && showTable && leaveRequests.length === 0 && (
-        <p className="text-gray-500 dark:text-gray-400">No leave requests found.</p>
-      )}
-
-      {showTable && !loading && leaveRequests.length > 0 && (
-        <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
-          <thead>
-            <tr className="bg-gray-100 dark:bg-gray-800">
-              <th className="border px-4 py-2">Employee</th>              <th className="border px-4 py-2">Leave type </th>
-
-              <th className="border px-4 py-2">Reason</th>
-              <th className="border px-4 py-2">Start Date</th>
-              <th className="border px-4 py-2">End Date</th>
-              <th className="border px-4 py-2">Status</th>
-              <th className="border px-4 py-2">Manager Approval</th>
-              <th className="border px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaveRequests.filter(request => request.status === 'Pending').map((request) => (
-              <tr key={request.id} className="bg-white dark:bg-gray-900">
-                <td className="border px-4 py-2">{request.employee?.fullname || "Unknown"}</td>
-                <td className="border px-4 py-2">{request.leaveType.leave_type}</td>
-                <td className="border px-4 py-2">{request.reason}</td>
-                <td className="border px-4 py-2">{new Date(request.startDate).toLocaleDateString()}</td>
-                <td className="border px-4 py-2">{new Date(request.endDate).toLocaleDateString()}</td>
-                <td className="border px-4 py-2">{request.status}</td>
-                <td className="border px-4 py-2">{request.manager_approval}</td>
-                <td className="border px-4 py-2 space-x-2">
-                  <button
-                    onClick={() => handleApproval(request.id, "Approved")}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded disabled:opacity-50"
-                    disabled={request.manager_approval !== "Pending"}
-                  >
-                    ✅ Approve
-                  </button>
-                  <button
-                    onClick={() => handleApproval(request.id, "Rejected")}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded disabled:opacity-50"
-                    disabled={request.manager_approval !== "Pending"}
-                  >
-                    ❌ Reject
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          {/* Main Content */}
+          {renderCurrentView()}
+        </motion.div>
+      </div>
     </div>
   );
 };
