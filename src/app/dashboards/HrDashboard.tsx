@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiBell, FiCheck, FiX, FiCalendar, FiLoader, FiAlertCircle, FiCheckCircle, FiUser } from "react-icons/fi";
 import EmployeeDashboard from "./EmployeeDashboard";
-import LeaveCalendar from "../calendar/page";
+import LeaveCalendar from "../calendar/calendar";
 import EmployeeManagement from "./EmployeeManagement";
 
 // Interfaces

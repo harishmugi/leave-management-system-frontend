@@ -13,7 +13,7 @@ import {
   FiUser
 } from "react-icons/fi";
 import EmployeeDashboard from "./EmployeeDashboard";
-import LeaveCalendar from "../calendar/page";
+import LeaveCalendar from "../calendar/calendar";
 
 type LeaveRequest = {
   reason: string;

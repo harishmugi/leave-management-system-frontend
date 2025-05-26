@@ -12,7 +12,7 @@ import {
   FiCheckCircle,
   FiUser   
 } from "react-icons/fi";
-import LeaveCalendar from "../calendar/page";
+import LeaveCalendar from "../calendar/calendar";
 
 type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
 
