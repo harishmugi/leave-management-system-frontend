@@ -4,13 +4,13 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { option } from 'framer-motion/client';
 
 const localizer = momentLocalizer(moment);
-interface Role{
-    role: string;
-}
-interface LeaveEvent extends Role {
+
+// Define role here instead of passing as a prop
+const role: 'Manager' | 'HR' | 'Director' = 'Manager'; // You can set this dynamically later
+
+interface LeaveEvent {
   id: string;
   title: string;
   start: Date;
@@ -18,8 +18,11 @@ interface LeaveEvent extends Role {
   leaveType: string;
   employeeName: string;
   color: string;
+  role: string;
 }
-
+interface LeaveCalendarProps {
+  role: 'Manager' | 'HR' | 'Director';
+}
 const leaveColors: Record<string, string> = {
   'Casual Leave': '#3B82F6',
   'Sick Leave': '#EF4444',
@@ -28,7 +31,8 @@ const leaveColors: Record<string, string> = {
   'Unpaid Leave': '#10B981',
   'Maternity/Paternity Leave': '#F59E0B'
 };
-export default function LeaveCalendar( {role}:Role ) {
+
+export default function CalendarPage({role}:LeaveCalendarProps) {
   const [events, setEvents] = useState<LeaveEvent[]>([]);
   const [allData, setAllData] = useState<LeaveEvent[]>([]);
   const [search, setSearch] = useState('');
@@ -41,7 +45,7 @@ export default function LeaveCalendar( {role}:Role ) {
 
   useEffect(() => {
     fetchLeaves();
-  }, [role]);
+  }, []);
 
   const fetchLeaves = async () => {
     setIsLoading(true);
@@ -97,7 +101,7 @@ export default function LeaveCalendar( {role}:Role ) {
     }
 
     return filtered;
-  }, [search, userRole, leaveType, allData, role]);
+  }, [search, userRole, leaveType, allData]);
 
   useEffect(() => {
     setEvents(filteredEvents);
@@ -123,7 +127,6 @@ End Date: ${event.end.toLocaleDateString()}
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -134,7 +137,6 @@ End Date: ${event.end.toLocaleDateString()}
             </p>
           </div>
 
-          {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-end">
             <input
               placeholder="Search team members..."
@@ -167,7 +169,6 @@ End Date: ${event.end.toLocaleDateString()}
             >
               <option value="">All Leave Types</option>
               <option value="Casual Leave">Casual Leave</option>
-
               <option value="Maternity/Paternity Leave">Maternity/Paternity Leave</option>
               <option value="Sick Leave">Sick Leave</option>
               <option value="Earned Leave">Earned Leave</option>
@@ -189,7 +190,6 @@ End Date: ${event.end.toLocaleDateString()}
           </div>
         </div>
 
-        {/* Error message */}
         {error && (
           <div className="bg-red-500 text-white p-3 rounded mb-4 flex justify-between items-center">
             <span>{error}</span>
@@ -202,7 +202,6 @@ End Date: ${event.end.toLocaleDateString()}
           </div>
         )}
 
-        {/* Calendar */}
         <div className="border border-gray-800 rounded-xl overflow-hidden bg-gray-800 shadow-xl">
           <Calendar
             localizer={localizer}
