@@ -48,6 +48,7 @@ const ManagerDashboard = () => {
       if (!response.ok) throw new Error("Failed to fetch leave requests");
 
       const data = await response.json();
+      console.log('data get', data)
       setLeaveRequests(data);
       setNotification({ text: "Leave requests loaded successfully", type: "success" });
     } catch (err: any) {

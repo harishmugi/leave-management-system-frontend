@@ -18,6 +18,7 @@ type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
 
 type LeaveRequest = {
   id: string;
+  reason:string;
   startDate: string;
   endDate: string;
   status: string;
@@ -133,7 +134,7 @@ const DirectorDashboard = () => {
                     <table className="w-full bg-white dark:bg-gray-700 rounded-xl overflow-hidden">
                       <thead className="bg-gray-100 dark:bg-gray-800">
                         <tr>
-                          {["Employee", "Start Date", "End Date", "Manager Approval", "HR Approval", "Director Approval", "Actions"].map(
+                          {["Employee", "Reason","Start Date", "End Date", "Manager Approval", "HR Approval", "Director Approval", "Actions"].map(
                             (header) => (
                               <th
                                 key={header}
@@ -154,6 +155,8 @@ const DirectorDashboard = () => {
                                 {request.employee?.fullname || "Unknown"}
                               </td>
                               <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
+                                {request.reason}
+                              </td>  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
                                 {new Date(request.startDate).toLocaleDateString()}
                               </td>
                               <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
