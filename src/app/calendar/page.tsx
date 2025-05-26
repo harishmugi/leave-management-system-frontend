@@ -32,7 +32,7 @@ const leaveColors: Record<string, string> = {
   'Maternity/Paternity Leave': '#F59E0B'
 };
 
-export default function CalendarPage({role}:LeaveCalendarProps) {
+export default function CalendarPage({role}: { role: 'Manager' | 'HR' | 'Director' }) {
   const [events, setEvents] = useState<LeaveEvent[]>([]);
   const [allData, setAllData] = useState<LeaveEvent[]>([]);
   const [search, setSearch] = useState('');
