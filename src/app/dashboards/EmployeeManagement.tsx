@@ -52,7 +52,7 @@ const EmployeeManagement = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch("http://localhost:3000/employees", {
+            const response = await fetch("https://leave-management-system-backend-g9ke.onrender.com/employees", {
                 method: "GET",
                 credentials: "include",
             });
@@ -77,7 +77,7 @@ const EmployeeManagement = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch("http://localhost:3000/employee/restore", {
+            const response = await fetch("https://leave-management-system-backend-g9ke.onrender.com/employee/restore", {
                 method: "GET",
                 credentials: "include",
             });
@@ -105,8 +105,8 @@ const EmployeeManagement = () => {
         try {
             const isNewEmployee = !employeeData.id;
             const url = isNewEmployee
-                ? "http://localhost:3000/employees"
-                : `http://localhost:3000/employees/${employeeData.id}`;
+                ? "https://leave-management-system-backend-g9ke.onrender.com/employees"
+                : `https://leave-management-system-backend-g9ke.onrender.com/employees/${employeeData.id}`;
 
             const method = isNewEmployee ? "POST" : "PUT";
 
@@ -158,7 +158,7 @@ const EmployeeManagement = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://localhost:3000/employee/${id}`, {
+            const response = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/employee/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -190,7 +190,7 @@ const EmployeeManagement = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://localhost:3000/employee/${id}`, {
+            const response = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/employee/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
