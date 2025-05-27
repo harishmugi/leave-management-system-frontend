@@ -61,7 +61,7 @@ const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const fetchLeaveTypes = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3000/leaveTypes');
+      const res = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveTypes');
       if (!res.ok) throw new Error('Failed to load leave types.');
       const data: LeaveType[] = await res.json();
       setLeaveTypes(data);
@@ -78,7 +78,7 @@ const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
     setLoading(true);
     try {
       console.log('Fetching leave requests...');
-      const response = await fetch('http://localhost:3000/leaveRequests', {
+      const response = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveRequests', {
         method: 'GET',
         credentials: 'include',
       });
@@ -98,7 +98,7 @@ const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const fetchLeaveDetails = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/leaveBalance', {
+      const response = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveBalance', {
         method: 'GET',
         credentials: 'include',
       });
@@ -118,7 +118,7 @@ const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const handleLeaveRequestSubmit = async (formData: LeaveRequestFormValues) => {
     try {
       setFormKey(prev => prev + 1);
-      const response = await fetch('http://localhost:3000/leaveRequest', {
+      const response = await fetch('https://leave-management-system-backend-g9ke.onrender.com/leaveRequest', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
