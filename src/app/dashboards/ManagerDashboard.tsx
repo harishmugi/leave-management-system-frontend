@@ -40,7 +40,7 @@ const ManagerDashboard = () => {
     setLoading(true);
     setNotification({ text: "", type: "" });
     try {
-      const response = await fetch("https://leave-management-system-backend-g9ke.onrender.com/leaveRequests/approver", {
+      const response = await fetch("http://localhost:3000/leaveRequests/approver", {
         method: "GET",
         credentials: "include",
       });
@@ -61,7 +61,7 @@ const ManagerDashboard = () => {
 
   const handleApproval = async (id: string, decision: "Approved" | "Rejected") => {
     try {
-      const response = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/leaveRequest/${id}`, {
+      const response = await fetch(`http://localhost:3000/leaveRequest/${id}`, {
         method: "PATCH",
         credentials: "include",
         headers: {

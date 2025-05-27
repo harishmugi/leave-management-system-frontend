@@ -50,7 +50,7 @@ export default function CalendarPage({role}: { role: 'Manager' | 'HR' | 'Directo
   const fetchLeaves = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`https://leave-management-system-backend-g9ke.onrender.com/leaveRequests/calendar/${role}`, {
+      const res = await fetch(`http://localhost:3000/leaveRequests/calendar/${role}`, {
         method: 'GET',
         credentials: 'include',
       });
