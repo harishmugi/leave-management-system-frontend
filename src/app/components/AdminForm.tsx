@@ -62,7 +62,7 @@ const AdminForm: React.FC = () => {
     };
 
     try {
-      const response = await fetch('https://leave-management-system-backend-g9ke.onrender.com/employees', {
+      const response = await fetch('http://localhost:3000/employees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fullPayload),
@@ -108,7 +108,7 @@ const AdminForm: React.FC = () => {
     formData.append('file', uploadFile);
 
     try {
-      const res = await fetch('https://leave-management-system-backend-g9ke.onrender.com/employees/bulk-upload', {
+      const res = await fetch('http://localhost:3000/employees/bulk-upload', {
         method: 'POST',
         body: formData,
       });

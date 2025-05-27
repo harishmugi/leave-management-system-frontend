@@ -18,7 +18,7 @@ const Dashboard = () => {
     async function getData() {
       try {
         /*
-        const res = await fetch('https://leave-management-system-backend-g9ke.onrender.com/me', {
+        const res = await fetch('http://localhost:3000/me', {
           method: 'GET',
           credentials: 'include', // Required to include HttpOnly cookies
         });
